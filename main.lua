@@ -1,40 +1,243 @@
 --==================================================
--- TARZBOT FISH IT GUI (ALL IN ONE)
+-- AZKA UI | FISH IT | FIX TOTAL
 --==================================================
 
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
+local LP = Players.LocalPlayer
 
---================ SCREEN GUI ======================
-local gui = Instance.new("ScreenGui", player.PlayerGui)
-gui.Name = "TarzBotGUI"
-gui.ResetOnSpawn = false
+-- PARENT (AMAN UNTUK EXECUTOR)
+local parentGui = game:GetService("CoreGui")
 
---================ MAIN FRAME ======================
-local Main = Instance.new("Frame", gui)
-Main.Size = UDim2.new(0,360,0,430)
-Main.Position = UDim2.new(0.5,-180,0.5,-215)
-Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+-- HAPUS JIKA SUDAH ADA
+pcall(function()
+    parentGui.AZKA_UI:Destroy()
+end)
+
+--==================================================
+-- SCREEN GUI
+--==================================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AZKA_UI"
+ScreenGui.Parent = parentGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+--==================================================
+-- MAIN WINDOW
+--==================================================
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.fromOffset(500, 320)
+Main.Position = UDim2.fromScale(0.5, 0.5)
+Main.AnchorPoint = Vector2.new(0.5, 0.5)
+Main.BackgroundColor3 = Color3.fromRGB(15,15,25)
+Main.BorderSizePixel = 0
 Main.Active = true
 Main.Draggable = true
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
 
---================ TOP BAR =========================
+--==================================================
+-- TOP BAR
+--==================================================
 local Top = Instance.new("Frame", Main)
-Top.Size = UDim2.new(1,0,0,40)
-Top.BackgroundColor3 = Color3.fromRGB(35,35,35)
+Top.Size = UDim2.new(1,0,0,34)
+Top.BackgroundColor3 = Color3.fromRGB(22,22,35)
+Top.BorderSizePixel = 0
+Instance.new("UICorner", Top).CornerRadius = UDim.new(0,12)
 
 local Title = Instance.new("TextLabel", Top)
-Title.Size = UDim2.new(1,-90,1,0)
-Title.Position = UDim2.new(0,10,0,0)
-Title.Text = "Azka"
-Title.TextColor3 = Color3.new(1,1,1)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
+Title.Size = UDim2.new(1,-80,1,0)
+Title.Position = UDim2.fromOffset(12,0)
 Title.BackgroundTransparency = 1
+Title.Text = "AZKA"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextColor3 = Color3.fromRGB(120,200,255)
 Title.TextXAlignment = Left
+
+-- MINIMIZE
+local Min = Instance.new("TextButton", Top)
+Min.Size = UDim2.fromOffset(24,18)
+Min.Position = UDim2.fromOffset(448,8)
+Min.Text = "-"
+Min.Font = Enum.Font.GothamBold
+Min.TextSize = 18
+Min.TextColor3 = Color3.new(1,1,1)
+Min.BackgroundColor3 = Color3.fromRGB(70,70,100)
+Min.BorderSizePixel = 0
+Instance.new("UICorner", Min).CornerRadius = UDim.new(0,6)
+
+-- CLOSE
+local Close = Instance.new("TextButton", Top)
+Close.Size = UDim2.fromOffset(24,18)
+Close.Position = UDim2.fromOffset(472,8)
+Close.Text = "X"
+Close.Font = Enum.Font.GothamBold
+Close.TextSize = 14
+Close.TextColor3 = Color3.new(1,1,1)
+Close.BackgroundColor3 = Color3.fromRGB(160,60,60)
+Close.BorderSizePixel = 0
+Instance.new("UICorner", Close).CornerRadius = UDim.new(0,6)
+
+--==================================================
+-- SIDEBAR
+--==================================================
+local Side = Instance.new("Frame", Main)
+Side.Position = UDim2.fromOffset(0,34)
+Side.Size = UDim2.new(0,130,1,-34)
+Side.BackgroundColor3 = Color3.fromRGB(18,18,28)
+Side.BorderSizePixel = 0
+
+--==================================================
+-- CONTENT
+--==================================================
+local Content = Instance.new("Frame", Main)
+Content.Position = UDim2.fromOffset(140,44)
+Content.Size = UDim2.new(1,-150,1,-54)
+Content.BackgroundTransparency = 1
+
+local Layout = Instance.new("UIListLayout", Content)
+Layout.Padding = UDim.new(0,6)
+
+--==================================================
+-- LOGO MINIMIZE
+--==================================================
+local Logo = Instance.new("TextButton", ScreenGui)
+Logo.Size = UDim2.fromOffset(54,54)
+Logo.Position = UDim2.fromOffset(40,300)
+Logo.Text = "AZKA"
+Logo.Visible = false
+Logo.Font = Enum.Font.GothamBold
+Logo.TextSize = 12
+Logo.TextColor3 = Color3.fromRGB(120,200,255)
+Logo.BackgroundColor3 = Color3.fromRGB(20,20,30)
+Logo.Active = true
+Logo.Draggable = true
+Logo.BorderSizePixel = 0
+Instance.new("UICorner", Logo).CornerRadius = UDim.new(1,0)
+
+--==================================================
+-- BUTTON ACTIONS
+--==================================================
+Close.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+Min.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    Logo.Visible = true
+end)
+
+Logo.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    Logo.Visible = false
+end)
+
+--==================================================
+-- UI HELPERS
+--==================================================
+local function Clear()
+    for _,v in ipairs(Content:GetChildren()) do
+        if v:IsA("TextButton") then
+            v:Destroy()
+        end
+    end
+end
+
+local function Button(txt, cb)
+    local b = Instance.new("TextButton", Content)
+    b.Size = UDim2.new(1,0,0,28)
+    b.Text = txt
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 12
+    b.TextColor3 = Color3.fromRGB(235,235,255)
+    b.BackgroundColor3 = Color3.fromRGB(30,30,45)
+    b.BorderSizePixel = 0
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
+    if cb then b.MouseButton1Click:Connect(cb) end
+end
+
+--==================================================
+-- TELEPORT DATA (LENGKAP)
+--==================================================
+local TP = {
+    ["Starter Pier"] = CFrame.new(0,8,50),
+    ["Fisherman Island"] = CFrame.new(220,9,40),
+    ["Ocean"] = CFrame.new(0,5,-300),
+    ["Sandy Bay"] = CFrame.new(-150,8,120),
+    ["Forest River"] = CFrame.new(-320,8,40),
+    ["Deep Reef"] = CFrame.new(0,-40,-450),
+    ["Mystic Valley"] = CFrame.new(300,12,-200),
+    ["Frozen Depths"] = CFrame.new(-500,-30,-600),
+    ["Lava Cavern"] = CFrame.new(480,-20,320),
+    ["Kohana Island"] = CFrame.new(120,10,-60),
+    ["Kohana Volcano"] = CFrame.new(160,40,-90),
+    ["Tropical Grove"] = CFrame.new(-60,10,260),
+    ["Crater Island"] = CFrame.new(400,20,420),
+    ["Lost Isle - Patung SysPush"] = CFrame.new(0,10,0),
+    ["Lost Isle - Ruang Harta Karun"] = CFrame.new(40,10,120),
+}
+
+--==================================================
+-- TELEPORT MENU
+--==================================================
+local function TeleportMenu()
+    Clear()
+    Button("== TELEPORT TEMPAT ==")
+
+    for name,cf in pairs(TP) do
+        Button("📍 "..name,function()
+            local hrp = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then hrp.CFrame = cf end
+        end)
+    end
+
+    Button("== TELEPORT PLAYER ==")
+
+    for _,plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LP then
+            Button("👤 "..plr.Name,function()
+                local my = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+                local tg = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                if my and tg then
+                    my.CFrame = tg.CFrame * CFrame.new(0,0,3)
+                end
+            end)
+        end
+    end
+end
+
+--==================================================
+-- INFO MENU
+--==================================================
+local function InfoMenu()
+    Clear()
+    Button("AZKA Script")
+    Button("Game : Fish It")
+    Button("Style : Chloe X Inspired")
+    Button("Status : Stable")
+end
+
+--==================================================
+-- SIDEBAR BUTTONS
+--==================================================
+local function SideButton(text, y, cb)
+    local b = Instance.new("TextButton", Side)
+    b.Size = UDim2.new(1,0,0,34)
+    b.Position = UDim2.fromOffset(0,y)
+    b.Text = text
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 13
+    b.TextColor3 = Color3.fromRGB(120,200,255)
+    b.BackgroundColor3 = Color3.fromRGB(22,22,35)
+    b.BorderSizePixel = 0
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
+    b.MouseButton1Click:Connect(cb)
+end
+
+SideButton("Teleport", 10, TeleportMenu)
+SideButton("Informasi", 52, InfoMenu)
+
+-- DEFAULT
+TeleportMenu()Title.TextXAlignment = Left
 
 local MinBtn = Instance.new("TextButton", Top)
 MinBtn.Size = UDim2.new(0,30,0,30)
