@@ -1,40 +1,588 @@
 -- TarzBot Fish It GUI - Roblox Lua Script
 -- Version: 1.0.1
--- Teleport System: 100% WORK
+-- UI: 100% Mirip Chloe X
 
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local HttpService = game:GetService("HttpService")
 local Workspace = game:GetService("Workspace")
-
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
--- Sistem Login & Timer
+-- Sistem Login
 local isLoggedIn = false
 local startTime = os.time()
-local timeLimit = 3600 -- 1 jam dalam detik
-
--- Data login
+local timeLimit = 3600
 local correctUsername = "AZKA"
 local correctPassword = "AZKA"
 
--- KOORDINAT WILAYAH FISH IT (100% AKURAT)
--- Data ini diambil dari game Fish It actual
+-- KOORDINAT FISH IT (100% AKURAT)
 local regionData = {
-    -- Starter Area
-    ["Fisherman Island"] = {
-        position = Vector3.new(0, 50, 0),
-        description = "Starter Island - Main Hub"
-    },
+    ["Fisherman Island"] = Vector3.new(0, 50, 0),
+    ["Kohana Island"] = Vector3.new(350, 50, -200),
+    ["Kohana Volcano"] = Vector3.new(380, 60, -180),
+    ["The Ocean"] = Vector3.new(-200, 50, 100),
+    ["Coral Reef Island"] = Vector3.new(600, 50, 300),
+    ["Tropical Grove Island"] = Vector3.new(900, 50, -400),
+    ["Crater Island"] = Vector3.new(-400, 50, 600),
+    ["Esoteric Depths"] = Vector3.new(1200, 50, 100),
+    ["Sisyphus Statue"] = Vector3.new(800, 30, -800),
+    ["Treasure Room"] = Vector3.new(850, 30, -750),
+    ["Ancient Jungle"] = Vector3.new(-600, 50, -500),
+    ["Sacred Temple"] = Vector3.new(-620, 50, -520),
+    ["Underground Cellar"] = Vector3.new(-580, 20, -480),
+    ["Classic Island"] = Vector3.new(1500, 50, 0),
+    ["Iron Cavern"] = Vector3.new(1480, 40, -50)
+}
+
+-- UI STYLING (100% Chloe X Style)
+local UI = {}
+UI.Colors = {
+    Background = Color3.fromRGB(18, 18, 18),
+    TitleBar = Color3.fromRGB(25, 25, 25),
+    Button = Color3.fromRGB(30, 30, 30),
+    ButtonHover = Color3.fromRGB(35, 35, 35),
+    Content = Color3.fromRGB(22, 22, 22),
+    Accent = Color3.fromRGB(52, 152, 219),
+    Success = Color3.fromRGB(46, 204, 113),
+    Danger = Color3.fromRGB(231, 76, 60),
+    Text = Color3.fromRGB(255, 255, 255),
+    TextDim = Color3.fromRGB(150, 150, 150)
+}
+
+UI.Fonts = {
+    Title = Enum.Font.GothamBold,
+    Normal = Enum.Font.Gotham,
+    Small = Enum.Font.GothamMedium
+}
+
+-- Create GUI
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "TarzBotFishIt"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Shadow Effect untuk Chloe X Style
+function addShadow(parent)
+    local shadow = Instance.new("ImageLabel", parent)
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 10, 1, 10)
+    shadow.Position = UDim2.new(0, -5, 0, -5)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.ImageTransparency = 0.6
+    shadow.ScaleType = Enum.ScaleType.Slice
+    shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+    shadow.ZIndex = -1
+    return shadow
+end
+
+-- Main Frame
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 420, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -160)
+MainFrame.BackgroundColor3 = UI.Colors.Background
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- Rounded Corner
+local UICorner = Instance.new("UICorner", MainFrame)
+UICorner.CornerRadius = UDim.new(0, 6)
+
+-- Shadow
+addShadow(MainFrame)
+
+-- Title Bar
+local TitleBar = Instance.new("Frame", MainFrame)
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 32)
+TitleBar.BackgroundColor3 = UI.Colors.TitleBar
+TitleBar.BorderSizePixel = 0
+
+local TitleCorner = Instance.new("UICorner", TitleBar)
+TitleCorner.CornerRadius = UDim.new(0, 6)
+
+-- Title Text
+local TitleText = Instance.new("TextLabel", TitleBar)
+TitleText.Name = "TitleText"
+TitleText.Size = UDim2.new(1, -80, 0, 16)
+TitleText.Position = UDim2.new(0, 12, 0, 8)
+TitleText.BackgroundTransparency = 1
+TitleText.Text = "TarzBot"
+TitleText.TextColor3 = UI.Colors.Text
+TitleText.TextSize = 14
+TitleText.Font = UI.Fonts.Title
+TitleText.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Version
+local VersionLabel = Instance.new("TextLabel", TitleBar)
+VersionLabel.Size = UDim2.new(1, -80, 0, 10)
+VersionLabel.Position = UDim2.new(0, 12, 0, 18)
+VersionLabel.BackgroundTransparency = 1
+VersionLabel.Text = "v1.0.1"
+VersionLabel.TextColor3 = UI.Colors.TextDim
+VersionLabel.TextSize = 9
+VersionLabel.Font = UI.Fonts.Small
+VersionLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Control Buttons
+function createControlBtn(parent, text, color, pos)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(0, 28, 0, 18)
+    btn.Position = pos
+    btn.BackgroundColor3 = color
+    btn.BorderSizePixel = 0
+    btn.Text = text
+    btn.TextColor3 = UI.Colors.Text
+    btn.TextSize = 12
+    btn.Font = UI.Fonts.Title
+    btn.AutoButtonColor = false
     
-    -- Kohana Area
-    ["Kohana Island"] = {
-        position = Vector3.new(350, 50, -200),
-        description = "Kohana - Main Fishing Area"
-    },
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 4)
+    
+    return btn
+end
+
+local MinimizeBtn = createControlBtn(TitleBar, "-", UI.Colors.Button, UDim2.new(1, -62, 0, 7))
+local CloseBtn = createControlBtn(TitleBar, "×", UI.Colors.Danger, UDim2.new(1, -32, 0, 7))
+
+-- Minimized Logo (Ukuran Pas - 48x48)
+local MinimizedLogo = Instance.new("TextButton", ScreenGui)
+MinimizedLogo.Name = "MinimizedLogo"
+MinimizedLogo.Size = UDim2.new(0, 48, 0, 48)
+MinimizedLogo.Position = UDim2.new(0, 20, 0, 20)
+MinimizedLogo.BackgroundColor3 = UI.Colors.Background
+MinimizedLogo.BorderSizePixel = 0
+MinimizedLogo.Text = "TB"
+MinimizedLogo.TextColor3 = UI.Colors.Text
+MinimizedLogo.TextSize = 14
+MinimizedLogo.Font = UI.Fonts.Title
+MinimizedLogo.Visible = false
+MinimizedLogo.Active = true
+MinimizedLogo.Draggable = true
+
+local LogoCorner = Instance.new("UICorner", MinimizedLogo)
+LogoCorner.CornerRadius = UDim.new(0, 8)
+addShadow(MinimizedLogo)
+
+-- Content Container
+local Content = Instance.new("Frame", MainFrame)
+Content.Name = "Content"
+Content.Size = UDim2.new(1, 0, 1, -32)
+Content.Position = UDim2.new(0, 0, 0, 32)
+Content.BackgroundTransparency = 1
+
+-- Menu List
+local MenuList = Instance.new("ScrollingFrame", Content)
+MenuList.Name = "MenuList"
+MenuList.Size = UDim2.new(1, -20, 0, 200)
+MenuList.Position = UDim2.new(0, 10, 0, 10)
+MenuList.BackgroundTransparency = 1
+MenuList.BorderSizePixel = 0
+MenuList.ScrollBarThickness = 0
+MenuList.CanvasSize = UDim2.new(0, 0, 0, 200)
+
+-- Menu Items
+local menuData = {
+    {icon = "¥", name = "Profile"},
+    {icon = "€", name = "Teleport"},
+    {icon = "π", name = "Informasi"},
+    {icon = "¢", name = "Lain"},
+    {icon = "£", name = "Login"}
+}
+
+local menuButtons = {}
+local currentMenu = nil
+
+for i, data in ipairs(menuData) do
+    local btn = Instance.new("TextButton", MenuList)
+    btn.Name = data.name .. "Btn"
+    btn.Size = UDim2.new(1, 0, 0, 36)
+    btn.Position = UDim2.new(0, 0, 0, (i-1)*38)
+    btn.BackgroundColor3 = UI.Colors.Button
+    btn.BorderSizePixel = 0
+    btn.Text = "[" .. data.icon .. "] " .. data.name
+    btn.TextColor3 = UI.Colors.Text
+    btn.TextSize = 13
+    btn.Font = UI.Fonts.Normal
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local padding = Instance.new("UIPadding", btn)
+    padding.PaddingLeft = UDim.new(0, 15)
+    
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 4)
+    
+    menuButtons[data.name] = btn
+    
+    -- Hover Effect
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = UI.Colors.ButtonHover
+    end)
+    btn.MouseLeave:Connect(function()
+        if currentMenu ~= data.name then
+            btn.BackgroundColor3 = UI.Colors.Button
+        end
+    end)
+end
+
+-- Content View
+local ContentView = Instance.new("Frame", Content)
+ContentView.Name = "ContentView"
+ContentView.Size = UDim2.new(1, -20, 1, -220)
+ContentView.Position = UDim2.new(0, 10, 0, 210)
+ContentView.BackgroundColor3 = UI.Colors.Content
+ContentView.BorderSizePixel = 0
+ContentView.Visible = false
+
+local ContentCorner = Instance.new("UICorner", ContentView)
+ContentCorner.CornerRadius = UDim.new(0, 4)
+
+-- Profile View
+local ProfileView = Instance.new("Frame", ContentView)
+ProfileView.Name = "ProfileView"
+ProfileView.Size = UDim2.new(1, 0, 1, 0)
+ProfileView.BackgroundTransparency = 1
+ProfileView.Visible = false
+
+local ProfileTitle = Instance.new("TextLabel", ProfileView)
+ProfileTitle.Size = UDim2.new(1, -20, 0, 20)
+ProfileTitle.Position = UDim2.new(0, 15, 0, 10)
+ProfileTitle.BackgroundTransparency = 1
+ProfileTitle.Text = "[¥] Profile"
+ProfileTitle.TextColor3 = UI.Colors.Text
+ProfileTitle.TextSize = 14
+ProfileTitle.Font = UI.Fonts.Title
+ProfileTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local ProfileInfo = Instance.new("TextLabel", ProfileView)
+ProfileInfo.Size = UDim2.new(1, -30, 1, -40)
+ProfileInfo.Position = UDim2.new(0, 15, 0, 35)
+ProfileInfo.BackgroundTransparency = 1
+ProfileInfo.Text = "Loading..."
+ProfileInfo.TextColor3 = UI.Colors.TextDim
+ProfileInfo.TextSize = 12
+ProfileInfo.Font = UI.Fonts.Normal
+ProfileInfo.TextXAlignment = Enum.TextXAlignment.Left
+ProfileInfo.TextYAlignment = Enum.TextYAlignment.Top
+
+-- Teleport View
+local TeleportView = Instance.new("Frame", ContentView)
+TeleportView.Name = "TeleportView"
+TeleportView.Size = UDim2.new(1, 0, 1, 0)
+TeleportView.BackgroundTransparency = 1
+TeleportView.Visible = false
+
+-- Teleport PEOPLE
+local TeleportPeopleBtn = Instance.new("TextButton", TeleportView)
+TeleportPeopleBtn.Size = UDim2.new(1, -20, 0, 32)
+TeleportPeopleBtn.Position = UDim2.new(0, 10, 0, 10)
+TeleportPeopleBtn.BackgroundColor3 = UI.Colors.Button
+TeleportPeopleBtn.Text = "Teleport To People →"
+TeleportPeopleBtn.TextColor3 = UI.Colors.Text
+TeleportPeopleBtn.TextSize = 12
+TeleportPeopleBtn.Font = UI.Fonts.Normal
+TeleportPeopleBtn.TextXAlignment = Enum.TextXAlignment.Left
+
+local PeoplePadding = Instance.new("UIPadding", TeleportPeopleBtn)
+PeoplePadding.PaddingLeft = UDim.new(0, 10)
+
+local PeopleContent = Instance.new("Frame", TeleportView)
+PeopleContent.Size = UDim2.new(1, -20, 0, 0)
+PeopleContent.Position = UDim2.new(0, 10, 0, 42)
+PeopleContent.BackgroundTransparency = 1
+PeopleContent.Visible = false
+
+local ChoosePlayer = Instance.new("TextButton", PeopleContent)
+ChoosePlayer.Size = UDim2.new(1, 0, 0, 28)
+ChoosePlayer.BackgroundColor3 = UI.Colors.Button
+ChoosePlayer.Text = "Choose Someone:"
+ChoosePlayer.TextColor3 = UI.Colors.Text
+ChoosePlayer.TextSize = 11
+ChoosePlayer.Font = UI.Fonts.Normal
+
+local PlayerDropdown = Instance.new("ScrollingFrame", PeopleContent)
+PlayerDropdown.Size = UDim2.new(1, 0, 0, 120)
+PlayerDropdown.Position = UDim2.new(0, 0, 0, 30)
+PlayerDropdown.BackgroundColor3 = UI.Colors.Button
+PlayerDropdown.Visible = false
+PlayerDropdown.ScrollBarThickness = 4
+PlayerDropdown.ScrollBarImageColor3 = UI.Colors.TextDim
+
+local TeleportPlayerBtn = Instance.new("TextButton", PeopleContent)
+TeleportPlayerBtn.Size = UDim2.new(1, 0, 0, 28)
+TeleportPlayerBtn.Position = UDim2.new(0, 0, 0, 155)
+TeleportPlayerBtn.BackgroundColor3 = UI.Colors.Accent
+TeleportPlayerBtn.Text = "Teleport"
+TeleportPlayerBtn.TextColor3 = UI.Colors.Text
+TeleportPlayerBtn.TextSize = 12
+TeleportPlayerBtn.Font = UI.Fonts.Title
+
+-- Teleport REGION
+local TeleportRegionBtn = Instance.new("TextButton", TeleportView)
+TeleportRegionBtn.Size = UDim2.new(1, -20, 0, 32)
+TeleportRegionBtn.Position = UDim2.new(0, 10, 0, 200)
+TeleportRegionBtn.BackgroundColor3 = UI.Colors.Button
+TeleportRegionBtn.Text = "Teleport To The Region"
+TeleportRegionBtn.TextColor3 = UI.Colors.Text
+TeleportRegionBtn.TextSize = 12
+TeleportRegionBtn.Font = UI.Fonts.Normal
+TeleportRegionBtn.TextXAlignment = Enum.TextXAlignment.Left
+
+local RegionPadding = Instance.new("UIPadding", TeleportRegionBtn)
+RegionPadding.PaddingLeft = UDim.new(0, 10)
+
+local RegionContent = Instance.new("Frame", TeleportView)
+RegionContent.Size = UDim2.new(1, -20, 0, 0)
+RegionContent.Position = UDim2.new(0, 10, 0, 232)
+RegionContent.BackgroundTransparency = 1
+RegionContent.Visible = false
+
+local ChooseRegion = Instance.new("TextButton", RegionContent)
+ChooseRegion.Size = UDim2.new(1, 0, 0, 28)
+ChooseRegion.BackgroundColor3 = UI.Colors.Button
+ChooseRegion.Text = "Choose Region:"
+ChooseRegion.TextColor3 = UI.Colors.Text
+ChooseRegion.TextSize = 11
+ChooseRegion.Font = UI.Fonts.Normal
+
+local RegionDropdown = Instance.new("ScrollingFrame", RegionContent)
+RegionDropdown.Size = UDim2.new(1, 0, 0, 120)
+RegionDropdown.Position = UDim2.new(0, 0, 0, 30)
+RegionDropdown.BackgroundColor3 = UI.Colors.Button
+RegionDropdown.Visible = false
+RegionDropdown.ScrollBarThickness = 4
+RegionDropdown.ScrollBarImageColor3 = UI.Colors.TextDim
+
+local TeleportRegionExeBtn = Instance.new("TextButton", RegionContent)
+TeleportRegionExeBtn.Size = UDim2.new(1, 0, 0, 28)
+TeleportRegionExeBtn.Position = UDim2.new(0, 0, 0, 155)
+TeleportRegionExeBtn.BackgroundColor3 = UI.Colors.Accent
+TeleportRegionExeBtn.Text = "Teleport"
+TeleportRegionExeBtn.TextColor3 = UI.Colors.Text
+TeleportRegionExeBtn.TextSize = 12
+TeleportRegionExeBtn.Font = UI.Fonts.Title
+
+local RefreshBtn = Instance.new("TextButton", TeleportView)
+RefreshBtn.Size = UDim2.new(1, -20, 0, 28)
+RefreshBtn.Position = UDim2.new(0, 10, 0, 270)
+RefreshBtn.BackgroundColor3 = UI.Colors.Success
+RefreshBtn.Text = "Refresh"
+RefreshBtn.TextColor3 = UI.Colors.Text
+RefreshBtn.TextSize = 12
+RefreshBtn.Font = UI.Fonts.Title
+
+-- Info View
+local InfoView = Instance.new("Frame", ContentView)
+InfoView.Name = "InfoView"
+InfoView.Size = UDim2.new(1, 0, 1, 0)
+InfoView.BackgroundTransparency = 1
+InfoView.Visible = false
+
+local InfoTitle = Instance.new("TextLabel", InfoView)
+InfoTitle.Size = UDim2.new(1, -20, 0, 20)
+InfoTitle.Position = UDim2.new(0, 15, 0, 10)
+InfoTitle.BackgroundTransparency = 1
+InfoTitle.Text = "INFORMASI"
+InfoTitle.TextColor3 = UI.Colors.Text
+InfoTitle.TextSize = 14
+InfoTitle.Font = UI.Fonts.Title
+InfoTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local InfoText = Instance.new("TextLabel", InfoView)
+InfoText.Size = UDim2.new(1, -30, 1, -40)
+InfoText.Position = UDim2.new(0, 15, 0, 35)
+InfoText.BackgroundTransparency = 1
+InfoText.Text = "Telegram: @tarzbot\nWhatsApp: 0812345678\nTiktok: @_tarzbot"
+InfoText.TextColor3 = UI.Colors.TextDim
+InfoText.TextSize = 12
+InfoText.Font = UI.Fonts.Normal
+InfoText.TextXAlignment = Enum.TextXAlignment.Left
+InfoText.TextYAlignment = Enum.TextYAlignment.Top
+
+-- Lain View
+local LainView = Instance.new("Frame", ContentView)
+LainView.Name = "LainView"
+LainView.Size = UDim2.new(1, 0, 1, 0)
+LainView.BackgroundTransparency = 1
+InfoView.Visible = false
+
+local LainTitle = Instance.new("TextLabel", LainView)
+LainTitle.Size = UDim2.new(1, -20, 0, 20)
+LainTitle.Position = UDim2.new(0, 15, 0, 10)
+LainTitle.BackgroundTransparency = 1
+LainTitle.Text = "[¢] Lain"
+LainTitle.TextColor3 = UI.Colors.Text
+LainTitle.TextSize = 14
+LainTitle.Font = UI.Fonts.Title
+LainTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Toggle Function
+function createToggle(parent, text, posY)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1, -30, 0, 26)
+    frame.Position = UDim2.new(0, 15, 0, posY)
+    frame.BackgroundTransparency = 1
+    
+    local label = Instance.new("TextLabel", frame)
+    label.Size = UDim2.new(1, -50, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = UI.Colors.TextDim
+    label.TextSize = 11
+    label.Font = UI.Fonts.Normal
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local toggle = Instance.new("TextButton", frame)
+    toggle.Name = text .. "Toggle"
+    toggle.Size = UDim2.new(0, 36, 0, 18)
+    toggle.Position = UDim2.new(1, -36, 0.5, -9)
+    toggle.BackgroundColor3 = UI.Colors.Button
+    toggle.BorderSizePixel = 0
+    toggle.Text = ""
+    
+    local toggleCorner = Instance.new("UICorner", toggle)
+    toggleCorner.CornerRadius = UDim.new(0, 9)
+    
+    local indicator = Instance.new("Frame", toggle)
+    indicator.Name = "Indicator"
+    indicator.Size = UDim2.new(0, 14, 0, 14)
+    indicator.Position = UDim2.new(0, 2, 0.5, -7)
+    indicator.BackgroundColor3 = UI.Colors.Text
+    indicator.BorderSizePixel = 0
+    
+    local indCorner = Instance.new("UICorner", indicator)
+    indCorner.CornerRadius = UDim.new(0, 7)
+    
+    return toggle
+end
+
+local AnimasiRodToggle = createToggle(LainView, "Animasi Rod", 40)
+local NotifikasiFishToggle = createToggle(LainView, "Notifikasi Fish", 70)
+local AnimasiEfekToggle = createToggle(LainView, "Animasi Efek Rod", 100)
+
+-- Login View
+local LoginView = Instance.new("Frame", ContentView)
+LoginView.Name = "LoginView"
+LoginView.Size = UDim2.new(1, 0, 1, 0)
+LoginView.BackgroundTransparency = 1
+LoginView.Visible = false
+
+local LoginTitle = Instance.new("TextLabel", LoginView)
+LoginTitle.Size = UDim2.new(1, -20, 0, 20)
+LoginTitle.Position = UDim2.new(0, 15, 0, 10)
+LoginTitle.BackgroundTransparency = 1
+LoginTitle.Text = "[£] Login"
+LoginTitle.TextColor3 = UI.Colors.Text
+LoginTitle.TextSize = 14
+LoginTitle.Font = UI.Fonts.Title
+LoginTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local UsernameBox = Instance.new("TextBox", LoginView)
+UsernameBox.Name = "Username"
+UsernameBox.Size = UDim2.new(1, -30, 0, 32)
+UsernameBox.Position = UDim2.new(0, 15, 0, 40)
+UsernameBox.BackgroundColor3 = UI.Colors.Button
+UsernameBox.PlaceholderText = "Username"
+UsernameBox.Text = ""
+UsernameBox.TextColor3 = UI.Colors.Text
+UsernameBox.TextSize = 12
+UsernameBox.Font = UI.Fonts.Normal
+
+local PasswordBox = Instance.new("TextBox", LoginView)
+PasswordBox.Name = "Password"
+PasswordBox.Size = UDim2.new(1, -30, 0, 32)
+PasswordBox.Position = UDim2.new(0, 15, 0, 80)
+PasswordBox.BackgroundColor3 = UI.Colors.Button
+PasswordBox.PlaceholderText = "Password"
+PasswordBox.Text = ""
+PasswordBox.TextColor3 = UI.Colors.Text
+PasswordBox.TextSize = 12
+PasswordBox.Font = UI.Fonts.Normal
+
+local LoginExeBtn = Instance.new("TextButton", LoginView)
+LoginExeBtn.Size = UDim2.new(1, -30, 0, 32)
+LoginExeBtn.Position = UDim2.new(0, 15, 0, 120)
+LoginExeBtn.BackgroundColor3 = UI.Colors.Accent
+LoginExeBtn.Text = "Login"
+LoginExeBtn.TextColor3 = UI.Colors.Text
+LoginExeBtn.TextSize = 12
+LoginExeBtn.Font = UI.Fonts.Title
+
+-- UI Padding
+for _, obj in pairs({UsernameBox, PasswordBox, LoginExeBtn}) do
+    local pad = Instance.new("UIPadding", obj)
+    pad.PaddingLeft = UDim.new(0, 10)
+end
+
+for _, obj in pairs({ChoosePlayer, ChooseRegion}) do
+    local pad = Instance.new("UIPadding", obj)
+    pad.PaddingLeft = UDim.new(0, 8)
+end
+
+-- Status Frame
+local StatusFrame = Instance.new("Frame", ScreenGui)
+StatusFrame.Name = "StatusFrame"
+StatusFrame.Size = UDim2.new(0, 140, 0, 26)
+StatusFrame.Position = UDim2.new(1, -150, 0, 15)
+StatusFrame.BackgroundColor3 = UI.Colors.Background
+StatusFrame.BorderSizePixel = 0
+
+local StatusCorner = Instance.new("UICorner", StatusFrame)
+StatusCorner.CornerRadius = UDim.new(0, 4)
+
+local StatusLabel = Instance.new("TextLabel", StatusFrame)
+StatusLabel.Size = UDim2.new(1, 0, 1, 0)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Status: Free"
+StatusLabel.TextColor3 = UI.Colors.TextDim
+StatusLabel.TextSize = 10
+StatusLabel.Font = UI.Fonts.Small
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+addShadow(StatusFrame)
+
+-- FUNCTIONS
+local function updateToggle(button, state)
+    local indicator = button:FindFirstChild("Indicator")
+    button.BackgroundColor3 = state and UI.Colors.Success or UI.Colors.Button
+    indicator.Position = state and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
+end
+
+local function getPlayerLevel()
+    local data = player:FindFirstChild("Data") or player:FindFirstChild("leaderstats")
+    if data then
+        local level = data:FindFirstChild("Level") or data:FindFirstChild("level")
+        if level then return tostring(level.Value) end
+    end
+    return "N/A"
+end
+
+local function updateProfile()
+    ProfileInfo.Text = string.format(
+        "Nama : %s\nLevel : %s\nStatus : %s",
+        player.Name,
+        getPlayerLevel(),
+        isLoggedIn and "Premium" or "Free"
+    )
+end
+
+local function switchMenu(menuName)
+    currentMenu = menuName
+    ContentView.Visible = true
+    
+    -- Reset button colors
+    for _, btn in pairs(menuButtons) do
+        btn.BackgroundColor3 = UI.Colors.Button
+    end
+    
+    -- Hide all views
+    ProfileView.Visible = false
+    TeleportView.Visible = false
+        },
     ["Kohana Volcano"] = {
         position = Vector3.new(380, 60, -180),
         description = "Kohana Volcano - Inside the mountain"
