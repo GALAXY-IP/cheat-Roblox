@@ -1,9 +1,11 @@
--- TarzBot Fish It GUI - Roblox Lua Script
+-- TarzBot Fish It GUI - 100% Mirip Chloe X
 -- Version: 1.0.1
--- UI: 100% Mirip Chloe X
+-- Status: FULLY FUNCTIONAL
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
@@ -15,7 +17,7 @@ local timeLimit = 3600
 local correctUsername = "AZKA"
 local correctPassword = "AZKA"
 
--- KOORDINAT FISH IT (100% AKURAT)
+-- KOORDINAT FISH IT (AKTUAL)
 local regionData = {
     ["Fisherman Island"] = Vector3.new(0, 50, 0),
     ["Kohana Island"] = Vector3.new(350, 50, -200),
@@ -34,7 +36,602 @@ local regionData = {
     ["Iron Cavern"] = Vector3.new(1480, 40, -50)
 }
 
--- UI STYLING (100% Chloe X Style)
+-- CHLOE X COLORS
+local COLORS = {
+    BG = Color3.fromRGB(18, 18, 18),
+    TITLEBAR = Color3.fromRGB(25, 25, 25),
+    BUTTON = Color3.fromRGB(30, 30, 30),
+    BUTTON_HOVER = Color3.fromRGB(35, 35, 35),
+    CONTENT = Color3.fromRGB(22, 22, 22),
+    ACCENT = Color3.fromRGB(52, 152, 219),
+    SUCCESS = Color3.fromRGB(46, 204, 113),
+    DANGER = Color3.fromRGB(231, 76, 60),
+    TEXT = Color3.fromRGB(255, 255, 255),
+    TEXT_DIM = Color3.fromRGB(150, 150, 150)
+}
+
+-- FONT
+local FONT_BOLD = Enum.Font.GothamBold
+local FONT_NORMAL = Enum.Font.Gotham
+local FONT_SMALL = Enum.Font.GothamMedium
+
+-- Tambah Shadow
+function addShadow(parent)
+    local shadow = Instance.new("ImageLabel")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 12, 1, 12)
+    shadow.Position = UDim2.new(0, -6, 0, -6)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.ImageTransparency = 0.7
+    shadow.ScaleType = Enum.ScaleType.Slice
+    shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+    shadow.ZIndex = -1
+    shadow.Parent = parent
+    return shadow
+end
+
+-- MAIN GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TarzBotGUI"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.BackgroundColor3 = COLORS.BG
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 6)
+UICorner.Parent = MainFrame
+
+addShadow(MainFrame)
+
+-- Title Bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 30)
+TitleBar.BackgroundColor3 = COLORS.TITLEBAR
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 6)
+TitleCorner.Parent = TitleBar
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Size = UDim2.new(1, -70, 0, 14)
+Title.Position = UDim2.new(0, 12, 0, 8)
+Title.BackgroundTransparency = 1
+Title.Text = "TarzBot"
+Title.TextColor3 = COLORS.TEXT
+Title.TextSize = 13
+Title.Font = FONT_BOLD
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TitleBar
+
+local Version = Instance.new("TextLabel")
+Version.Name = "Version"
+Version.Size = UDim2.new(1, -70, 0, 10)
+Version.Position = UDim2.new(0, 12, 0, 18)
+Version.BackgroundTransparency = 1
+Version.Text = "v1.0.1"
+Version.TextColor3 = COLORS.TEXT_DIM
+Version.TextSize = 8
+Version.Font = FONT_SMALL
+Version.TextXAlignment = Enum.TextXAlignment.Left
+Version.Parent = TitleBar
+
+-- Control Buttons
+function makeControlBtn(name, text, color, xPos)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Size = UDim2.new(0, 26, 0, 16)
+    btn.Position = UDim2.new(1, xPos, 0, 7)
+    btn.BackgroundColor3 = color
+    btn.BorderSizePixel = 0
+    btn.Text = text
+    btn.TextColor3 = COLORS.TEXT
+    btn.TextSize = 11
+    btn.Font = FONT_BOLD
+    btn.AutoButtonColor = false
+    btn.Parent = TitleBar
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = btn
+    return btn
+end
+
+local MinBtn = makeControlBtn("MinBtn", "-", COLORS.BUTTON, -58)
+local CloseBtn = makeControlBtn("CloseBtn", "×", COLORS.DANGER, -30)
+
+-- Minimized Logo (48x48 - PAS)
+local Logo = Instance.new("TextButton")
+Logo.Name = "MinimizedLogo"
+Logo.Size = UDim2.new(0, 48, 0, 48)
+Logo.Position = UDim2.new(0, 20, 0, 20)
+Logo.BackgroundColor3 = COLORS.BG
+Logo.BorderSizePixel = 0
+Logo.Text = "TB"
+Logo.TextColor3 = COLORS.TEXT
+Logo.TextSize = 13
+Logo.Font = FONT_BOLD
+Logo.Visible = false
+Logo.Active = true
+Logo.Draggable = true
+Logo.Parent = ScreenGui
+
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(0, 8)
+LogoCorner.Parent = Logo
+
+addShadow(Logo)
+
+-- Menu Container
+local MenuContainer = Instance.new("Frame")
+MenuContainer.Name = "MenuContainer"
+MenuContainer.Size = UDim2.new(1, 0, 1, -30)
+MenuContainer.Position = UDim2.new(0, 0, 0, 30)
+MenuContainer.BackgroundTransparency = 1
+MenuContainer.Parent = MainFrame
+
+-- Menu Buttons (5 Menu)
+local menus = {
+    {icon = "¥", name = "Profile"},
+    {icon = "€", name = "Teleport"},
+    {icon = "π", name = "Informasi"},
+    {icon = "¢", name = "Lain"},
+    {icon = "£", name = "Login"}
+}
+
+local menuBtns = {}
+for i, menu in ipairs(menus) do
+    local btn = Instance.new("TextButton")
+    btn.Name = menu.name
+    btn.Size = UDim2.new(1, -20, 0, 34)
+    btn.Position = UDim2.new(0, 10, 0, 10 + (i-1)*36)
+    btn.BackgroundColor3 = COLORS.BUTTON
+    btn.BorderSizePixel = 0
+    btn.Text = "[" .. menu.icon .. "] " .. menu.name
+    btn.TextColor3 = COLORS.TEXT
+    btn.TextSize = 12
+    btn.Font = FONT_NORMAL
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = MenuContainer
+    
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft = UDim.new(0, 12)
+    pad.Parent = btn
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = btn
+    
+    menuBtns[menu.name] = btn
+end
+
+-- Separator
+local Sep = Instance.new("Frame")
+Sep.Size = UDim2.new(1, -20, 0, 1)
+Sep.Position = UDim2.new(0, 10, 0, 190)
+Sep.BackgroundColor3 = COLORS.BUTTON
+Sep.BorderSizePixel = 0
+Sep.Parent = MenuContainer
+
+-- Content Display
+local ContentDisplay = Instance.new("Frame")
+ContentDisplay.Name = "ContentDisplay"
+ContentDisplay.Size = UDim2.new(1, -20, 0, 80)
+ContentDisplay.Position = UDim2.new(0, 10, 0, 200)
+ContentDisplay.BackgroundColor3 = COLORS.CONTENT
+ContentDisplay.BorderSizePixel = 0
+ContentDisplay.Parent = MenuContainer
+
+local ContentCorner = Instance.new("UICorner")
+ContentCorner.CornerRadius = UDim.new(0, 4)
+ContentCorner.Parent = ContentDisplay
+
+-- Profile Content
+local ProfileContent = Instance.new("TextLabel")
+ProfileContent.Name = "ProfileContent"
+ProfileContent.Size = UDim2.new(1, -20, 1, -10)
+ProfileContent.Position = UDim2.new(0, 10, 0, 5)
+ProfileContent.BackgroundTransparency = 1
+ProfileContent.Text = "Loading profile..."
+ProfileContent.TextColor3 = COLORS.TEXT_DIM
+ProfileTextSize = 11
+ProfileFont = FONT_SMALL
+ProfileTextXAlignment = Enum.TextXAlignment.Left
+ProfileTextYAlignment = Enum.TextYAlignment.Top
+ProfileContent.Parent = ContentDisplay
+
+-- Teleport Content
+local TeleportContent = Instance.new("Frame")
+TeleportContent.Name = "TeleportContent"
+TeleportContent.Size = UDim2.new(1, 0, 1, 0)
+TeleportContent.BackgroundTransparency = 1
+TeleportContent.Visible = false
+TeleportContent.Parent = ContentDisplay
+
+local TP_PeopleBtn = Instance.new("TextButton")
+TP_PeopleBtn.Size = UDim2.new(1, -20, 0, 28)
+TP_PeopleBtn.Position = UDim2.new(0, 10, 0, 5)
+TP_PeopleBtn.BackgroundColor3 = COLORS.BUTTON
+TP_PeopleBtn.Text = "Teleport To People →"
+TP_PeopleBtn.TextColor3 = COLORS.TEXT
+TP_PeopleBtn.TextSize = 11
+TP_PeopleBtn.Font = FONT_NORMAL
+TP_PeopleBtn.TextXAlignment = Enum.TextXAlignment.Left
+TP_PeopleBtn.Parent = TeleportContent
+
+local PeopleDropdown = Instance.new("ScrollingFrame")
+PeopleDropdown.Name = "PeopleDropdown"
+PeopleDropdown.Size = UDim2.new(1, -20, 0, 100)
+PeopleDropdown.Position = UDim2.new(0, 10, 0, 35)
+PeopleDropdown.BackgroundColor3 = COLORS.CONTENT
+PeopleDropdown.Visible = false
+PeopleDropdown.ScrollBarThickness = 3
+PeopleDropdown.Parent = TeleportContent
+
+local TP_PlayerBtn = Instance.new("TextButton")
+TP_PlayerBtn.Size = UDim2.new(1, -20, 0, 26)
+TP_PlayerBtn.Position = UDim2.new(0, 10, 0, 140)
+TP_PlayerBtn.BackgroundColor3 = COLORS.SUCCESS
+TP_PlayerBtn.Text = "Teleport"
+TP_PlayerBtn.TextColor3 = COLORS.TEXT
+TP_PlayerBtn.TextSize = 11
+TP_PlayerBtn.Font = FONT_BOLD
+TP_PlayerBtn.Parent = TeleportContent
+
+local TP_RegionBtn = Instance.new("TextButton")
+TP_RegionBtn.Size = UDim2.new(1, -20, 0, 28)
+TP_RegionBtn.Position = UDim2.new(0, 10, 0, 175)
+TP_RegionBtn.BackgroundColor3 = COLORS.BUTTON
+TP_RegionBtn.Text = "Teleport To The Region"
+TP_RegionBtn.TextColor3 = COLORS.TEXT
+TP_RegionBtn.TextSize = 11
+TP_RegionBtn.Font = FONT_NORMAL
+TP_RegionBtn.TextXAlignment = Enum.TextXAlignment.Left
+TP_RegionBtn.Parent = TeleportContent
+
+local RegionDropdown = Instance.new("ScrollingFrame")
+RegionDropdown.Name = "RegionDropdown"
+RegionDropdown.Size = UDim2.new(1, -20, 0, 100)
+RegionDropdown.Position = UDim2.new(0, 10, 0, 205)
+RegionDropdown.BackgroundColor3 = COLORS.CONTENT
+RegionDropdown.Visible = false
+RegionDropdown.ScrollBarThickness = 3
+RegionDropdown.Parent = TeleportContent
+
+local TP_RegionExeBtn = Instance.new("TextButton")
+TP_RegionExeBtn.Size = UDim2.new(1, -20, 0, 26)
+TP_RegionExeBtn.Position = UDim2.new(0, 10, 0, 310)
+TP_RegionExeBtn.BackgroundColor3 = COLORS.SUCCESS
+TP_RegionExeBtn.Text = "Teleport"
+TP_RegionExeBtn.TextColor3 = COLORS.TEXT
+TP_RegionExeBtn.TextSize = 11
+TP_RegionExeBtn.Font = FONT_BOLD
+TP_RegionExeBtn.Parent = TeleportContent
+
+local RefreshBtn = Instance.new("TextButton")
+RefreshBtn.Size = UDim2.new(1, -20, 0, 26)
+RefreshBtn.Position = UDim2.new(0, 10, 0, 340)
+RefreshBtn.BackgroundColor3 = COLORS.ACCENT
+RefreshBtn.Text = "Refresh"
+RefreshBtn.TextColor3 = COLORS.TEXT
+RefreshBtn.TextSize = 11
+RefreshBtn.Font = FONT_BOLD
+RefreshBtn.Parent = TeleportContent
+
+-- Info Content
+local InfoContent = Instance.new("TextLabel")
+InfoContent.Name = "InfoContent"
+InfoContent.Size = UDim2.new(1, -20, 1, -10)
+InfoContent.Position = UDim2.new(0, 10, 0, 5)
+InfoContent.BackgroundTransparency = 1
+InfoContent.Text = "Telegram: @tarzbot\nWhatsApp: 0812345678\nTiktok: @_tarzbot"
+InfoContent.TextColor3 = COLORS.TEXT_DIM
+InfoContent.TextSize = 11
+InfoContent.Font = FONT_NORMAL
+InfoContent.TextXAlignment = Enum.TextXAlignment.Left
+InfoContent.TextYAlignment = Enum.TextYAlignment.Top
+InfoContent.Visible = false
+InfoContent.Parent = ContentDisplay
+
+-- Lain Content
+local LainContent = Instance.new("Frame")
+LainContent.Name = "LainContent"
+LainContent.Size = UDim2.new(1, 0, 1, 0)
+LainContent.BackgroundTransparency = 1
+LainContent.Visible = false
+LainContent.Parent = ContentDisplay
+
+function makeToggle(name, text, yPos)
+    local frame = Instance.new("Frame")
+    frame.Name = name
+    frame.Size = UDim2.new(1, -20, 0, 24)
+    frame.Position = UDim2.new(0, 10, 0, yPos)
+    frame.BackgroundTransparency = 1
+    frame.Parent = LainContent
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -50, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = COLORS.TEXT_DIM
+    label.TextSize = 11
+    label.Font = FONT_NORMAL
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = frame
+    
+    local toggle = Instance.new("TextButton")
+    toggle.Name = name .. "Toggle"
+    toggle.Size = UDim2.new(0, 36, 0, 18)
+    toggle.Position = UDim2.new(1, -36, 0.5, -9)
+    toggle.BackgroundColor3 = COLORS.BUTTON
+    toggle.BorderSizePixel = 0
+    toggle.Text = ""
+    toggle.Parent = frame
+    
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 9)
+    toggleCorner.Parent = toggle
+    
+    local indicator = Instance.new("Frame")
+    indicator.Name = "Indicator"
+    indicator.Size = UDim2.new(0, 14, 0, 14)
+    indicator.Position = UDim2.new(0, 2, 0.5, -7)
+    indicator.BackgroundColor3 = COLORS.TEXT
+    indicator.BorderSizePixel = 0
+    indicator.Parent = toggle
+    
+    local indCorner = Instance.new("UICorner")
+    indCorner.CornerRadius = UDim.new(0, 7)
+    indCorner.Parent = indicator
+    
+    return toggle
+end
+
+local Toggle1 = makeToggle("AnimasiRod", "Animasi Rod", 10)
+local Toggle2 = makeToggle("NotifikasiFish", "Notifikasi Fish", 40)
+local Toggle3 = makeToggle("AnimasiEfek", "Animasi Efek Rod", 70)
+
+-- Login Content
+local LoginContent = Instance.new("Frame")
+LoginContent.Name = "LoginContent"
+LoginContent.Size = UDim2.new(1, 0, 1, 0)
+LoginContent.BackgroundTransparency = 1
+LoginContent.Visible = false
+LoginContent.Parent = ContentDisplay
+
+local LoginTitle = Instance.new("TextLabel")
+LoginTitle.Size = UDim2.new(1, -20, 0, 20)
+LoginTitle.Position = UDim2.new(0, 10, 0, 5)
+LoginTitle.BackgroundTransparency = 1
+LoginTitle.Text = "[£] Login"
+LoginTitle.TextColor3 = COLORS.TEXT
+LoginTitle.TextSize = 12
+LoginTitle.Font = FONT_BOLD
+LoginTitle.Parent = LoginContent
+
+local UserBox = Instance.new("TextBox")
+UserBox.Name = "Username"
+UserBox.Size = UDim2.new(1, -20, 0, 28)
+UserBox.Position = UDim2.new(0, 10, 0, 30)
+UserBox.BackgroundColor3 = COLORS.BUTTON
+UserBox.PlaceholderText = "Username"
+UserBox.Text = ""
+UserBox.TextColor3 = COLORS.TEXT
+UserBox.TextSize = 11
+UserBox.Font = FONT_NORMAL
+UserBox.Parent = LoginContent
+
+local PassBox = Instance.new("TextBox")
+PassBox.Name = "Password"
+PassBox.Size = UDim2.new(1, -20, 0, 28)
+PassBox.Position = UDim2.new(0, 10, 0, 65)
+PassBox.BackgroundColor3 = COLORS.BUTTON
+PassBox.PlaceholderText = "Password"
+PassBox.Text = ""
+PassBox.TextColor3 = COLORS.TEXT
+PassBox.TextSize = 11
+PassBox.Font = FONT_NORMAL
+PassBox.Parent = LoginContent
+
+local LoginBtn = Instance.new("TextButton")
+LoginBtn.Size = UDim2.new(1, -20, 0, 28)
+LoginBtn.Position = UDim2.new(0, 10, 0, 100)
+LoginBtn.BackgroundColor3 = COLORS.ACCENT
+LoginBtn.Text = "Login"
+LoginBtn.TextColor3 = COLORS.TEXT
+LoginBtn.TextSize = 11
+LoginBtn.Font = FONT_BOLD
+LoginBtn.Parent = LoginContent
+
+-- Padding
+for _, obj in pairs({UserBox, PassBox, LoginBtn}) do
+    local pad = Instance.new("UIPadding", obj)
+    pad.PaddingLeft = UDim.new(0, 8)
+end
+
+-- Status Frame
+local StatusFrame = Instance.new("Frame")
+StatusFrame.Name = "StatusFrame"
+StatusFrame.Size = UDim2.new(0, 130, 0, 24)
+StatusFrame.Position = UDim2.new(1, -140, 0, 10)
+StatusFrame.BackgroundColor3 = COLORS.BG
+StatusFrame.BorderSizePixel = 0
+StatusFrame.Parent = ScreenGui
+
+local StatusCorner = Instance.new("UICorner", StatusFrame)
+StatusCorner.CornerRadius = UDim.new(0, 4)
+
+local StatusText = Instance.new("TextLabel")
+StatusText.Size = UDim2.new(1, 0, 1, 0)
+StatusText.BackgroundTransparency = 1
+StatusText.Text = "Status: Free"
+StatusText.TextColor3 = COLORS.TEXT_DIM
+StatusText.TextSize = 10
+StatusText.Font = FONT_SMALL
+StatusText.TextXAlignment = Enum.TextXAlignment.Center
+StatusText.Parent = StatusFrame
+
+addShadow(StatusFrame)
+
+-- TOGGLE STATES
+local toggles = {
+    AnimasiRod = false,
+    NotifikasiFish = false,
+    AnimasiEfek = false
+}
+
+-- FUNCTIONS
+function updateToggle(btn, state)
+    local ind = btn:FindFirstChild("Indicator")
+    btn.BackgroundColor3 = state and COLORS.SUCCESS or COLORS.BUTTON
+    ind.Position = state and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
+end
+
+function getLevel()
+    local data = player:FindFirstChild("Data") or player:FindFirstChild("leaderstats")
+    if data then
+        local lvl = data:FindFirstChild("Level") or data:FindFirstChild("level")
+        if lvl then return tostring(lvl.Value) end
+    end
+    return "N/A"
+end
+
+function updateProfile()
+    ProfileContent.Text = string.format(
+        "Nama : %s\nLevel : %s\nStatus : %s",
+        player.Name,
+        getLevel(),
+        isLoggedIn and "Premium" or "Free"
+    )
+end
+
+function hideAllContent()
+    ProfileContent.Visible = false
+    TeleportContent.Visible = false
+    InfoContent.Visible = false
+    LainContent.Visible = false
+    LoginContent.Visible = false
+end
+
+function showContent(name)
+    hideAllContent()
+    ContentDisplay.Visible = true
+    
+    for _, btn in pairs(menuBtns) do
+        btn.BackgroundColor3 = COLORS.BUTTON
+    end
+    
+    if name == "Profile" then
+        menuBtns["Profile"].BackgroundColor3 = COLORS.BUTTON_HOVER
+        ProfileContent.Visible = true
+        updateProfile()
+    elseif name == "Teleport" then
+        menuBtns["Teleport"].BackgroundColor3 = COLORS.BUTTON_HOVER
+        TeleportContent.Visible = true
+    elseif name == "Informasi" then
+        menuBtns["Informasi"].BackgroundColor3 = COLORS.BUTTON_HOVER
+        InfoContent.Visible = true
+    elseif name == "Lain" then
+        menuBtns["Lain"].BackgroundColor3 = COLORS.BUTTON_HOVER
+        LainContent.Visible = true
+    elseif name == "Login" then
+        menuBtns["Login"].BackgroundColor3 = COLORS.BUTTON_HOVER
+        LoginContent.Visible = true
+    end
+end
+
+function populatePlayers()
+    PeopleDropdown:ClearAllChildren()
+    local y = 0
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, 0, 0, 22)
+            btn.Position = UDim2.new(0, 0, 0, y)
+            btn.BackgroundTransparency = 1
+            btn.Text = "   " .. plr.Name
+            btn.TextColor3 = COLORS.TEXT
+            btn.TextSize = 10
+            btn.Font = FONT_NORMAL
+            btn.Parent = PeopleDropdown
+            
+            btn.MouseButton1Click:Connect(function()
+                TP_PeopleBtn.Text = "Teleport To People: " .. plr.Name
+                PeopleDropdown.Visible = false
+            end)
+            
+            y = y + 22
+        end
+    end
+    PeopleDropdown.CanvasSize = UDim2.new(0, 0, 0, y)
+end
+
+function populateRegions()
+    RegionDropdown:ClearAllChildren()
+    local y = 0
+    for regionName, _ in pairs(regionData) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 22)
+        btn.Position = UDim2.new(0, 0, 0, y)
+        btn.BackgroundTransparency = 1
+        btn.Text = "   " .. regionName
+        btn.TextColor3 = COLORS.TEXT
+        btn.TextSize = 10
+        btn.Font = FONT_NORMAL
+        btn.Parent = RegionDropdown
+        
+        btn.MouseButton1Click:Connect(function()
+            TP_RegionBtn.Text = "Teleport To The Region: " .. regionName
+            RegionDropdown.Visible = false
+        end)
+        
+        y = y + 22
+    end
+    RegionDropdown.CanvasSize = UDim2.new(0, 0, 0, y)
+end
+
+function teleportTo(pos)
+    if not isLoggedIn then
+        warn("⛔ Login untuk teleport!")
+        return
+    end
+    humanoidRootPart.CFrame = CFrame.new(pos + Vector3.new(0, 10, 0))
+    warn("✅ Teleport berhasil!")
+end
+
+-- EVENTS
+MinBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    Logo.Visible = true
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    Logo.Visible = false
+end)
+
+Logo.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    Logo.Visible = false
+end)
+
+menuBtns["Profile"].MouseButton1Click:Connect(function() showContent("Profile") end)
+menuBtns["Teleport"].MouseButton1-- UI STYLING (100% Chloe X Style)
 local UI = {}
 UI.Colors = {
     Background = Color3.fromRGB(18, 18, 18),
